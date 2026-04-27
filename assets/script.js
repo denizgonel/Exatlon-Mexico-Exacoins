@@ -25,7 +25,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const correctPasscode = "exatlon123";
 
     // CHANGE THIS PATH IF YOUR PNG IS IN A DIFFERENT FOLDER
-    const downloadFile = "assets/files/surprise-boxes.png";
+    const downloadFile = "assets/medias/surprise-boxes.png";
 
     let activeSourceCard = null;
     let floatingCard = null;
