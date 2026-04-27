@@ -45,14 +45,14 @@ body.card-open {
     align-items: center;
     justify-content: center;
 
-    height: 100vh;        /* makes it take full screen height */
-    text-align: center;   /* ensures text is centered */
+    height: 100vh;
+    text-align: center;
 }
 
 .mwg_effect001 .scroll-logo {
     width: 500px;
     height: auto;
-    }
+}
 
 .mwg_effect001 .header {
     position: absolute;
@@ -139,17 +139,41 @@ body.card-open {
     z-index: -1;
 }
 
+.mwg_effect001 .card-content h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(24px, 4.2vw, 72px);
+    line-height: 0.86;
+    padding: 0.2em 0.12em 0.12em;
+    white-space: normal;
+    text-wrap: balance;
+    overflow-wrap: normal;
+    word-break: normal;
+    max-width: 100%;
+}
+
+.mwg_effect001 .card-content h2.title-long {
+    line-height: 0.9;
+}
+
+.mwg_effect001 .card-content h2.title-extra-long {
+    line-height: 0.95;
+}
+
+@media (max-width: 900px) {
+    .mwg_effect001 .card-content h2 {
+        font-size: clamp(22px, 10vw, 44px);
+    }
+}
+
 .mwg_effect001 .card-content {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     height: 100%;
 }
 
-.mwg_effect001 .card-content p {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.5em 1em;
+.mwg_effect001 .card-content > div {
+    margin-top: auto;
 }
 
 .mwg_effect001 .from {
@@ -159,9 +183,13 @@ body.card-open {
 }
 
 .mwg_effect001 .card-content h2 {
-    font: 800 normal 4.5vw/0.8 'Inter', sans-serif;
-    text-wrap: auto;
-    padding: 0.2em 0 0.12em;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(28px, 4.5vw, 76px);
+    line-height: 0.85;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+    padding: 0.2em 0.08em 0.12em;
 }
 
 .mwg_effect001 .card:nth-child(1),
@@ -199,11 +227,102 @@ body.card-open {
     color: #FAFF9E;
 }
 
+/* BUTTON GRID */
+.reward-buttons {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 4;
+
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: clamp(8px, 1.4vw, 18px);
+
+    width: min(92vw, 1150px);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.reward-buttons.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.button-74 {
+    background-color: #fbeee0;
+    border: 2px solid #422800;
+    border-radius: 30px;
+    box-shadow: #422800 4px 4px 0 0;
+    color: #422800;
+    cursor: pointer;
+
+    width: 100%;
+    min-height: clamp(54px, 7vw, 86px);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: clamp(9px, 1vw, 16px);
+    line-height: 1.05;
+
+    padding: clamp(8px, 1vw, 16px);
+    text-align: center;
+    text-transform: uppercase;
+
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.button-74 * {
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.button-74 .btn-text {
+    flex: 1;
+    text-align: center;
+}
+
+.button-74 .price {
+    flex: 0 0 auto;
+
+    width: clamp(42px, 5vw, 68px);
+    height: clamp(42px, 5vw, 68px);
+
+    background: #FFD84D;
+    border: 2px solid #422800;
+    border-radius: 50%;
+    box-shadow: #422800 3px 3px 0 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #422800;
+    font-size: clamp(9px, 1vw, 14px);
+    font-weight: 800;
+    line-height: 1;
+}
+
+.button-74:hover {
+    background-color: #fff;
+}
+
+.button-74:active {
+    box-shadow: #422800 2px 2px 0 0;
+    transform: translate(2px, 2px);
+}
+
+/* CARD OPEN VIEW */
 .card-backdrop {
     position: fixed;
     inset: 0;
     background: rgba(8, 8, 8, 0.24);
- 
     opacity: 0;
     pointer-events: none;
     z-index: 1000;
@@ -284,6 +403,7 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
     visibility: hidden;
 }
 
+/* RESPONSIVE */
 @media (max-width: 900px) {
     .mwg_effect001 .header {
         flex-direction: column;
@@ -304,10 +424,211 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
     }
 
     .mwg_effect001 .card-content h2 {
-        font-size: 54px;
+        font-size: clamp(24px, 11vw, 46px);
     }
 
     .floating-card .card-content h2 {
         font-size: clamp(42px, 11vw, 82px);
     }
+
+    .reward-buttons {
+        grid-template-columns: repeat(3, 1fr);
+        width: 94vw;
+    }
+
+    .button-74 {
+        min-height: clamp(48px, 10vw, 72px);
+        font-size: clamp(8px, 2vw, 12px);
+        padding: 8px;
+    }
+
+    .button-74 .price {
+        width: clamp(38px, 7vw, 52px);
+        height: clamp(38px, 7vw, 52px);
+        font-size: clamp(8px, 1.8vw, 11px);
+    }
+}
+
+@media (max-width: 480px) {
+    .reward-buttons {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        width: 92vw;
+    }
+
+    .button-74 {
+        min-height: 58px;
+        font-size: 9px;
+        border-radius: 22px;
+    }
+
+    .button-74 .price {
+        width: 36px;
+        height: 36px;
+        font-size: 7px;
+    }
+
+    .mwg_effect001 .scroll-logo {
+        width: 80vw;
+    }
+}
+
+.final-unlock {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 30;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.final-unlock.is-visible {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.final-button {
+	--button_radius: 0.75em;
+	--button_color: #e8e8e8;
+	--button_outline_color: #000000;
+	font-size: clamp(16px, 2vw, 28px);
+	font-weight: bold;
+	border: none;
+	cursor: pointer;
+	border-radius: var(--button_radius);
+	background: var(--button_outline_color);
+	font-family: 'IBM Plex Mono', monospace;
+	text-transform: uppercase;
+}
+
+.button_top {
+	display: block;
+	box-sizing: border-box;
+	border: 2px solid var(--button_outline_color);
+	border-radius: var(--button_radius);
+	padding: 0.75em 1.5em;
+	background: var(--button_color);
+	color: var(--button_outline_color);
+	transform: translateY(-0.2em);
+	transition: transform 0.1s ease;
+}
+
+.final-button:hover .button_top {
+	transform: translateY(-0.33em);
+}
+
+.final-button:active .button_top {
+	transform: translateY(0);
+}
+
+.passcode-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 2000;
+	background: rgba(0, 0, 0, 0.65);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.passcode-modal.is-open {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.passcode-box {
+	width: min(92vw, 420px);
+	background: #fbeee0;
+	color: #422800;
+	border: 3px solid #422800;
+	border-radius: 24px;
+	box-shadow: #422800 8px 8px 0 0;
+	padding: 24px;
+	text-align: center;
+	font-family: 'IBM Plex Mono', monospace;
+}
+
+.passcode-box h2 {
+	font-size: 20px;
+	margin-bottom: 16px;
+	text-transform: uppercase;
+}
+
+#passcodeInput {
+	width: 100%;
+	border: 2px solid #422800;
+	border-radius: 12px;
+	padding: 12px;
+	font-family: 'IBM Plex Mono', monospace;
+	font-size: 16px;
+	margin-bottom: 12px;
+}
+
+.passcode-message {
+	min-height: 22px;
+	font-size: 13px;
+	font-weight: 700;
+	margin-bottom: 12px;
+}
+
+.passcode-keyboard {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 8px;
+	margin-bottom: 14px;
+}
+
+.passcode-keyboard button,
+.submit-passcode,
+.close-passcode {
+	border: 2px solid #422800;
+	background: #ffd84d;
+	color: #422800;
+	border-radius: 12px;
+	padding: 10px;
+	font-family: 'IBM Plex Mono', monospace;
+	font-weight: 800;
+	cursor: pointer;
+}
+
+.submit-passcode {
+	width: 100%;
+	background: #c9fe6e;
+	margin-bottom: 8px;
+}
+
+.close-passcode {
+	width: 100%;
+	background: #fff;
+}
+
+/* Override only COMPUTADORA INTELIGENTE card */
+.mwg_effect001 .card:nth-child(13) {
+    color: #2E003E; /* dark green */
+}
+
+.mwg_effect001 .card-content p,
+.floating-card .card-content p {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 1rem;
+
+    padding: 0.6em 1.1em; /* ← buffer from edges */
+}
+
+.mwg_effect001 .card-content p span:first-child,
+.floating-card .card-content p span:first-child {
+    text-align: left;
+}
+
+.mwg_effect001 .card-content p span:last-child,
+.floating-card .card-content p span:last-child {
+    text-align: right;
+    margin-left: auto;
 }

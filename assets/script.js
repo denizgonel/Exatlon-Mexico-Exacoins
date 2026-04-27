@@ -10,8 +10,27 @@ window.addEventListener("DOMContentLoaded", () => {
     const cards = document.querySelectorAll(".card");
     const backdrop = document.querySelector(".card-backdrop");
     const viewer = document.querySelector(".card-viewer");
+    const rewardButtons = document.querySelector(".reward-buttons");
+
+    const finalUnlock = document.querySelector(".final-unlock");
+    const finalButton = document.querySelector(".final-button");
+    const passcodeModal = document.querySelector(".passcode-modal");
+    const passcodeInput = document.querySelector("#passcodeInput");
+    const passcodeMessage = document.querySelector(".passcode-message");
+    const keyboardButtons = document.querySelectorAll(".passcode-keyboard button");
+    const submitPasscode = document.querySelector(".submit-passcode");
+    const closePasscode = document.querySelector(".close-passcode");
 
     const distance = cardsContainer.scrollWidth - window.innerWidth;
+    const buttonHold = 1200;
+    const correctPasscode = "exatlon123";
+
+    /*
+        Replace this later with your real file path.
+        Example:
+        const downloadFile = "assets/files/sorpresas.pdf";
+    */
+    const downloadFile = "assets/medias/surprise-boxes.png";
 
     let activeSourceCard = null;
     let floatingCard = null;
@@ -19,15 +38,90 @@ window.addEventListener("DOMContentLoaded", () => {
     let isAnimating = false;
     let openState = null;
 
-    gsap.to(".scroll-wrapper", {
+    function fitCardTitles() {
+        const titles = document.querySelectorAll(".mwg_effect001 .card-content h2");
+
+        titles.forEach((title) => {
+            title.classList.remove("title-long", "title-extra-long");
+            title.style.fontSize = "";
+
+            const textLength = title.textContent.trim().length;
+
+            if (textLength > 28) title.classList.add("title-long");
+            if (textLength > 42) title.classList.add("title-extra-long");
+
+            let fontSize = parseFloat(window.getComputedStyle(title).fontSize);
+            let lineHeight = parseFloat(window.getComputedStyle(title).lineHeight);
+
+            if (!lineHeight || Number.isNaN(lineHeight)) {
+                lineHeight = fontSize * 0.9;
+            }
+
+            const maxHeight = lineHeight * 3;
+
+            while (title.scrollHeight > maxHeight && fontSize > 16) {
+                fontSize -= 1;
+                title.style.fontSize = `${fontSize}px`;
+                lineHeight = parseFloat(window.getComputedStyle(title).lineHeight);
+
+                if (!lineHeight || Number.isNaN(lineHeight)) {
+                    lineHeight = fontSize * 0.9;
+                }
+            }
+        });
+    }
+
+    fitCardTitles();
+
+    gsap.set(rewardButtons, {
         autoAlpha: 0,
-        duration: 0.2,
+        pointerEvents: "none"
+    });
+
+    gsap.set(finalUnlock, {
+        autoAlpha: 0,
+        pointerEvents: "none"
+    });
+
+    gsap.timeline({
         scrollTrigger: {
-            trigger: cardsContainer,
+            trigger: container,
+            scrub: true,
             start: "top top",
-            end: "top top-=1",
-            toggleActions: "play none reverse none"
+            end: "+=" + buttonHold,
+            onEnter: () => {
+                rewardButtons.classList.add("is-visible");
+                gsap.set(rewardButtons, { pointerEvents: "auto" });
+            },
+            onLeave: () => {
+                rewardButtons.classList.remove("is-visible");
+                gsap.set(rewardButtons, { pointerEvents: "none" });
+            },
+            onEnterBack: () => {
+                rewardButtons.classList.add("is-visible");
+                gsap.set(rewardButtons, { pointerEvents: "auto" });
+            },
+            onLeaveBack: () => {
+                rewardButtons.classList.remove("is-visible");
+                gsap.set(rewardButtons, { pointerEvents: "none" });
+            }
         }
+    })
+    .to(".scroll-wrapper", {
+        autoAlpha: 0,
+        duration: 0.2
+    })
+    .to(rewardButtons, {
+        autoAlpha: 1,
+        duration: 0.3
+    })
+    .to(rewardButtons, {
+        autoAlpha: 1,
+        duration: 1.2
+    })
+    .to(rewardButtons, {
+        autoAlpha: 0,
+        duration: 0.3
     });
 
     const scrollTween = gsap.to(cardsContainer, {
@@ -38,7 +132,24 @@ window.addEventListener("DOMContentLoaded", () => {
             pin: true,
             scrub: true,
             start: "top top",
-            end: "+=" + distance
+            end: "+=" + (distance + buttonHold),
+            onUpdate: (self) => {
+                if (self.progress > 0.985 && !isOpen) {
+                    finalUnlock.classList.add("is-visible");
+                    gsap.to(finalUnlock, {
+                        autoAlpha: 1,
+                        duration: 0.25,
+                        pointerEvents: "auto"
+                    });
+                } else {
+                    finalUnlock.classList.remove("is-visible");
+                    gsap.to(finalUnlock, {
+                        autoAlpha: 0,
+                        duration: 0.2,
+                        pointerEvents: "none"
+                    });
+                }
+            }
         }
     });
 
@@ -66,6 +177,83 @@ window.addEventListener("DOMContentLoaded", () => {
                 scrub: true,
             }
         });
+    });
+
+    function openPasscodeModal() {
+        passcodeModal.classList.add("is-open");
+        passcodeInput.value = "";
+        passcodeMessage.textContent = "";
+        passcodeInput.focus();
+        lenis.stop();
+    }
+
+    function closePasscodeModal() {
+        passcodeModal.classList.remove("is-open");
+        passcodeInput.value = "";
+        passcodeMessage.textContent = "";
+        lenis.start();
+    }
+
+    function downloadProtectedFile() {
+        const link = document.createElement("a");
+        link.href = downloadFile;
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    function checkPasscode() {
+        const value = passcodeInput.value.trim();
+
+        if (value === correctPasscode) {
+            passcodeMessage.textContent = "Contraseña correcta. Descargando archivo...";
+            passcodeMessage.style.color = "#06402b";
+            downloadProtectedFile();
+        } else {
+            passcodeMessage.textContent = "Contraseña incorrecta.";
+            passcodeMessage.style.color = "#c01818";
+            passcodeInput.value = "";
+        }
+    }
+
+    if (finalButton) {
+        finalButton.addEventListener("click", openPasscodeModal);
+    }
+
+    if (closePasscode) {
+        closePasscode.addEventListener("click", closePasscodeModal);
+    }
+
+    if (submitPasscode) {
+        submitPasscode.addEventListener("click", checkPasscode);
+    }
+
+    if (passcodeInput) {
+        passcodeInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkPasscode();
+            if (e.key === "Escape") closePasscodeModal();
+        });
+    }
+
+    keyboardButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.textContent.trim();
+
+            if (key === "⌫") {
+                passcodeInput.value = passcodeInput.value.slice(0, -1);
+            } else {
+                passcodeInput.value += key;
+            }
+
+            passcodeInput.focus();
+        });
+    });
+
+    passcodeModal.addEventListener("click", (e) => {
+        if (e.target === passcodeModal) {
+            closePasscodeModal();
+        }
     });
 
     function getSourceRect(card) {
@@ -107,6 +295,8 @@ window.addEventListener("DOMContentLoaded", () => {
         cloneInner.style.borderColor = sourceInnerStyles.borderColor;
         cloneInner.style.borderRadius = sourceInnerStyles.borderRadius;
 
+        fitCardTitles();
+
         return clone;
     }
 
@@ -140,6 +330,8 @@ window.addEventListener("DOMContentLoaded", () => {
         floatingCard = buildFloatingCard(card);
         viewer.innerHTML = "";
         viewer.appendChild(floatingCard);
+
+        fitCardTitles();
 
         const scaleX = targetRect.width / sourceRect.width;
         const scaleY = targetRect.height / sourceRect.height;
@@ -213,6 +405,7 @@ window.addEventListener("DOMContentLoaded", () => {
         backdrop.style.pointerEvents = "none";
 
         lenis.start();
+        fitCardTitles();
     }
 
     function closeCard() {
@@ -255,7 +448,12 @@ window.addEventListener("DOMContentLoaded", () => {
             e.stopPropagation();
 
             if (isAnimating || isOpen) return;
+
             openCard(card);
+
+            if (floatingCard) {
+                floatingCard.addEventListener("click", handleFloatingCardClick);
+            }
         });
     });
 
@@ -269,5 +467,10 @@ window.addEventListener("DOMContentLoaded", () => {
         if (e.key === "Escape" && isOpen && !isAnimating) {
             closeCard();
         }
+    });
+
+    window.addEventListener("resize", () => {
+        fitCardTitles();
+        ScrollTrigger.refresh();
     });
 });
