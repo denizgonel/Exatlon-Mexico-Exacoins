@@ -384,10 +384,6 @@ body.card-open {
     height: 100%;
 }
 
-.floating-card .card-content h2 {
-    font-size: clamp(56px, 7vw, 120px);
-    line-height: 0.82;
-}
 
 .floating-card .card-content p {
     padding: 1rem 1.2rem;
@@ -644,4 +640,11 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
     .reward-buttons .button-74:last-child:active {
         transform: translateX(calc(50% + 7px)) translateY(2px);
     }
+}
+
+.floating-card .card-content h2,
+.floating-card .card-content p,
+.floating-card .card-content span,
+.floating-card .from {
+    font-size: inherit;
 }

@@ -37,12 +37,13 @@ window.addEventListener("DOMContentLoaded", () => {
 
     function getMotionFactor() {
         if (window.innerWidth <= 480) return 0.45;
-        if (window.innerWidth <= 900) return 0.65;
+        if (window.innerWidth <= 900) return 0.38;
+        if (window.innerWidth <= 1200) return 0.55;
         return 1;
     }
 
     function fitCardTitles() {
-        const titles = document.querySelectorAll(".mwg_effect001 .card-content h2");
+        const titles = document.querySelectorAll(".mwg_effect001 .cards > .card .card-content h2");
 
         titles.forEach((title) => {
             title.classList.remove("title-long", "title-extra-long");
@@ -65,6 +66,7 @@ window.addEventListener("DOMContentLoaded", () => {
             while (title.scrollHeight > maxHeight && fontSize > 16) {
                 fontSize -= 1;
                 title.style.fontSize = `${fontSize}px`;
+
                 lineHeight = parseFloat(window.getComputedStyle(title).lineHeight);
 
                 if (!lineHeight || Number.isNaN(lineHeight)) {
@@ -197,86 +199,29 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    function openPasscodeModal() {
-        if (!passcodeModal) return;
+    function freezeCloneTextStyles(sourceCard, cloneCard) {
+        const sourceElements = sourceCard.querySelectorAll(".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2");
+        const cloneElements = cloneCard.querySelectorAll(".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2");
 
-        passcodeModal.classList.add("is-open");
-        passcodeInput.value = "";
-        passcodeMessage.textContent = "";
-        passcodeInput.focus();
-        lenis.stop();
-    }
+        sourceElements.forEach((sourceEl, index) => {
+            const cloneEl = cloneElements[index];
+            if (!cloneEl) return;
 
-    function closePasscodeModal() {
-        if (!passcodeModal) return;
+            const styles = window.getComputedStyle(sourceEl);
 
-        passcodeModal.classList.remove("is-open");
-        passcodeInput.value = "";
-        passcodeMessage.textContent = "";
-        lenis.start();
-    }
-
-    function downloadProtectedFile() {
-        const link = document.createElement("a");
-        link.href = downloadFile;
-        link.download = "";
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-    }
-
-    function checkPasscode() {
-        const value = passcodeInput.value.trim();
-
-        if (value === correctPasscode) {
-            passcodeMessage.textContent = "Contraseña correcta. Descargando archivo...";
-            passcodeMessage.style.color = "#06402b";
-            downloadProtectedFile();
-        } else {
-            passcodeMessage.textContent = "Contraseña incorrecta.";
-            passcodeMessage.style.color = "#c01818";
-            passcodeInput.value = "";
-        }
-    }
-
-    if (finalButton) {
-        finalButton.addEventListener("click", openPasscodeModal);
-    }
-
-    if (closePasscode) {
-        closePasscode.addEventListener("click", closePasscodeModal);
-    }
-
-    if (submitPasscode) {
-        submitPasscode.addEventListener("click", checkPasscode);
-    }
-
-    if (passcodeInput) {
-        passcodeInput.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") checkPasscode();
-            if (e.key === "Escape") closePasscodeModal();
-        });
-    }
-
-    keyboardButtons.forEach((button) => {
-        button.addEventListener("click", () => {
-            const key = button.textContent.trim();
-
-            if (key === "⌫") {
-                passcodeInput.value = passcodeInput.value.slice(0, -1);
-            } else {
-                passcodeInput.value += key;
-            }
-
-            passcodeInput.focus();
-        });
-    });
-
-    if (passcodeModal) {
-        passcodeModal.addEventListener("click", (e) => {
-            if (e.target === passcodeModal) {
-                closePasscodeModal();
-            }
+            cloneEl.style.setProperty("font-family", styles.fontFamily, "important");
+            cloneEl.style.setProperty("font-size", styles.fontSize, "important");
+            cloneEl.style.setProperty("font-weight", styles.fontWeight, "important");
+            cloneEl.style.setProperty("line-height", styles.lineHeight, "important");
+            cloneEl.style.setProperty("letter-spacing", styles.letterSpacing, "important");
+            cloneEl.style.setProperty("text-align", styles.textAlign, "important");
+            cloneEl.style.setProperty("padding", styles.padding, "important");
+            cloneEl.style.setProperty("margin", styles.margin, "important");
+            cloneEl.style.setProperty("border", styles.border, "important");
+            cloneEl.style.setProperty("border-radius", styles.borderRadius, "important");
+            cloneEl.style.setProperty("display", styles.display, "important");
+            cloneEl.style.setProperty("justify-content", styles.justifyContent, "important");
+            cloneEl.style.setProperty("align-items", styles.alignItems, "important");
         });
     }
 
@@ -314,12 +259,14 @@ window.addEventListener("DOMContentLoaded", () => {
         clone.style.height = `${rect.height}px`;
         clone.style.borderRadius = sourceInnerStyles.borderRadius;
 
+        cloneInner.style.width = "100%";
+        cloneInner.style.height = "100%";
         cloneInner.style.borderWidth = sourceInnerStyles.borderWidth;
         cloneInner.style.borderStyle = sourceInnerStyles.borderStyle;
         cloneInner.style.borderColor = sourceInnerStyles.borderColor;
         cloneInner.style.borderRadius = sourceInnerStyles.borderRadius;
 
-        fitCardTitles();
+        freezeCloneTextStyles(card, clone);
 
         return clone;
     }
@@ -354,8 +301,6 @@ window.addEventListener("DOMContentLoaded", () => {
         floatingCard = buildFloatingCard(card);
         viewer.innerHTML = "";
         viewer.appendChild(floatingCard);
-
-        fitCardTitles();
 
         const scaleX = targetRect.width / sourceRect.width;
         const scaleY = targetRect.height / sourceRect.height;
@@ -482,16 +427,85 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     backdrop.addEventListener("click", () => {
-        if (isOpen && !isAnimating) {
-            closeCard();
-        }
+        if (isOpen && !isAnimating) closeCard();
     });
 
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && isOpen && !isAnimating) {
-            closeCard();
-        }
+        if (e.key === "Escape" && isOpen && !isAnimating) closeCard();
     });
+
+    function openPasscodeModal() {
+        if (!passcodeModal) return;
+
+        passcodeModal.classList.add("is-open");
+        passcodeInput.value = "";
+        passcodeMessage.textContent = "";
+        passcodeInput.focus();
+        lenis.stop();
+    }
+
+    function closePasscodeModal() {
+        if (!passcodeModal) return;
+
+        passcodeModal.classList.remove("is-open");
+        passcodeInput.value = "";
+        passcodeMessage.textContent = "";
+        lenis.start();
+    }
+
+    function downloadProtectedFile() {
+        const link = document.createElement("a");
+        link.href = downloadFile;
+        link.download = "";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+
+    function checkPasscode() {
+        const value = passcodeInput.value.trim();
+
+        if (value === correctPasscode) {
+            passcodeMessage.textContent = "Contraseña correcta. Descargando archivo...";
+            passcodeMessage.style.color = "#06402b";
+            downloadProtectedFile();
+        } else {
+            passcodeMessage.textContent = "Contraseña incorrecta.";
+            passcodeMessage.style.color = "#c01818";
+            passcodeInput.value = "";
+        }
+    }
+
+    if (finalButton) finalButton.addEventListener("click", openPasscodeModal);
+    if (closePasscode) closePasscode.addEventListener("click", closePasscodeModal);
+    if (submitPasscode) submitPasscode.addEventListener("click", checkPasscode);
+
+    if (passcodeInput) {
+        passcodeInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") checkPasscode();
+            if (e.key === "Escape") closePasscodeModal();
+        });
+    }
+
+    keyboardButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const key = button.textContent.trim();
+
+            if (key === "⌫") {
+                passcodeInput.value = passcodeInput.value.slice(0, -1);
+            } else {
+                passcodeInput.value += key;
+            }
+
+            passcodeInput.focus();
+        });
+    });
+
+    if (passcodeModal) {
+        passcodeModal.addEventListener("click", (e) => {
+            if (e.target === passcodeModal) closePasscodeModal();
+        });
+    }
 
     window.addEventListener("resize", () => {
         fitCardTitles();
