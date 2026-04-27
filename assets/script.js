@@ -23,7 +23,9 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const buttonHold = 1200;
     const correctPasscode = "exatlon123";
-    const downloadFile = "assets/files/surprise-boxes.zip";
+
+    // CHANGE THIS PATH IF YOUR PNG IS IN A DIFFERENT FOLDER
+    const downloadFile = "assets/files/surprise-boxes.png";
 
     let activeSourceCard = null;
     let floatingCard = null;
@@ -114,22 +116,22 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         }
     })
-    .to(".scroll-wrapper", {
-        autoAlpha: 0,
-        duration: 0.2
-    })
-    .to(rewardButtons, {
-        autoAlpha: 1,
-        duration: 0.3
-    })
-    .to(rewardButtons, {
-        autoAlpha: 1,
-        duration: 1.2
-    })
-    .to(rewardButtons, {
-        autoAlpha: 0,
-        duration: 0.3
-    });
+        .to(".scroll-wrapper", {
+            autoAlpha: 0,
+            duration: 0.2
+        })
+        .to(rewardButtons, {
+            autoAlpha: 1,
+            duration: 0.3
+        })
+        .to(rewardButtons, {
+            autoAlpha: 1,
+            duration: 1.2
+        })
+        .to(rewardButtons, {
+            autoAlpha: 0,
+            duration: 0.3
+        });
 
     const scrollTween = gsap.timeline({
         scrollTrigger: {
@@ -200,8 +202,13 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     function freezeCloneTextStyles(sourceCard, cloneCard) {
-        const sourceElements = sourceCard.querySelectorAll(".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2");
-        const cloneElements = cloneCard.querySelectorAll(".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2");
+        const sourceElements = sourceCard.querySelectorAll(
+            ".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2"
+        );
+
+        const cloneElements = cloneCard.querySelectorAll(
+            ".card-content, .card-content p, .card-content p span, .card-content > div, .from, .card-content h2"
+        );
 
         sourceElements.forEach((sourceEl, index) => {
             const cloneEl = cloneElements[index];
@@ -302,14 +309,11 @@ window.addEventListener("DOMContentLoaded", () => {
         viewer.innerHTML = "";
         viewer.appendChild(floatingCard);
 
-        const scaleX = targetRect.width / sourceRect.width;
-        const scaleY = targetRect.height / sourceRect.height;
-        const deltaX = targetRect.left - sourceRect.left;
-        const deltaY = targetRect.top - sourceRect.top;
-
         gsap.set(floatingCard, {
             x: sourceRect.left,
             y: sourceRect.top,
+            width: sourceRect.width,
+            height: sourceRect.height,
             scaleX: 1,
             scaleY: 1,
             rotation: sourceRotation,
@@ -338,11 +342,17 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        // IMPORTANT:
+        // This animates the real width and height of the cloned card.
+        // That means the image, frame, and text all expand together,
+        // without cutting off the words.
         gsap.to(floatingCard, {
-            x: sourceRect.left + deltaX,
-            y: sourceRect.top + deltaY,
-            scaleX,
-            scaleY,
+            x: targetRect.left,
+            y: targetRect.top,
+            width: targetRect.width,
+            height: targetRect.height,
+            scaleX: 1,
+            scaleY: 1,
             rotation: 0,
             duration: 0.55,
             ease: "expo.out",
@@ -391,9 +401,14 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        // IMPORTANT:
+        // This shrinks the real card size back to the source size.
+        // So the text de-expands together with the image.
         gsap.to(floatingCard, {
             x: openState.sourceRect.left,
             y: openState.sourceRect.top,
+            width: openState.sourceRect.width,
+            height: openState.sourceRect.height,
             scaleX: 1,
             scaleY: 1,
             rotation: openState.sourceRotation,
@@ -454,9 +469,11 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     function downloadProtectedFile() {
+        window.open(downloadFile, "_blank");
+
         const link = document.createElement("a");
         link.href = downloadFile;
-        link.download = "";
+        link.download = "surprise-boxes.png";
         document.body.appendChild(link);
         link.click();
         link.remove();
@@ -466,7 +483,7 @@ window.addEventListener("DOMContentLoaded", () => {
         const value = passcodeInput.value.trim();
 
         if (value === correctPasscode) {
-            passcodeMessage.textContent = "Contraseña correcta. Descargando archivo...";
+            passcodeMessage.textContent = "Contraseña correcta. Abriendo y descargando imagen...";
             passcodeMessage.style.color = "#06402b";
             downloadProtectedFile();
         } else {

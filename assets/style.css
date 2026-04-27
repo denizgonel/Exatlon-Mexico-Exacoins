@@ -648,3 +648,30 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
 .floating-card .from {
     font-size: inherit;
 }
+
+.floating-card .card-content {
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.floating-card .card-content p,
+.floating-card .card-content > div {
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.mwg_effect001 .card-content,
+.floating-card .card-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.mwg_effect001 .card-content > div,
+.floating-card .card-content > div {
+    margin-top: auto;
+}
+
+.floating-card .card-content {
+    justify-content: flex-start; /* prevents stretching */
+}
