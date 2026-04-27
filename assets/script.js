@@ -21,7 +21,6 @@ window.addEventListener("DOMContentLoaded", () => {
     const submitPasscode = document.querySelector(".submit-passcode");
     const closePasscode = document.querySelector(".close-passcode");
 
-    const distance = cardsContainer.scrollWidth - window.innerWidth;
     const buttonHold = 1200;
     const correctPasscode = "exatlon123";
     const downloadFile = "assets/files/surprise-boxes.zip";
@@ -31,6 +30,16 @@ window.addEventListener("DOMContentLoaded", () => {
     let isOpen = false;
     let isAnimating = false;
     let openState = null;
+
+    function getDistance() {
+        return cardsContainer.scrollWidth - window.innerWidth;
+    }
+
+    function getMotionFactor() {
+        if (window.innerWidth <= 480) return 0.45;
+        if (window.innerWidth <= 900) return 0.65;
+        return 1;
+    }
 
     function fitCardTitles() {
         const titles = document.querySelectorAll(".mwg_effect001 .card-content h2");
@@ -56,7 +65,6 @@ window.addEventListener("DOMContentLoaded", () => {
             while (title.scrollHeight > maxHeight && fontSize > 16) {
                 fontSize -= 1;
                 title.style.fontSize = `${fontSize}px`;
-
                 lineHeight = parseFloat(window.getComputedStyle(title).lineHeight);
 
                 if (!lineHeight || Number.isNaN(lineHeight)) {
@@ -127,7 +135,8 @@ window.addEventListener("DOMContentLoaded", () => {
             pin: true,
             scrub: true,
             start: "top top",
-            end: "+=" + (distance + buttonHold),
+            end: () => "+=" + (getDistance() + buttonHold),
+            invalidateOnRefresh: true,
             onUpdate: (self) => {
                 if (!finalUnlock) return;
 
@@ -157,26 +166,25 @@ window.addEventListener("DOMContentLoaded", () => {
             duration: buttonHold
         })
         .to(cardsContainer, {
-            x: -distance,
+            x: () => -getDistance(),
             ease: "none",
-            duration: distance
+            duration: () => getDistance()
         });
 
-    cards.forEach((card) => {
-        const values = {
-            x: (Math.random() * 20 + 30) * (Math.random() < 0.5 ? 1 : -1),
-            y: (Math.random() * 6 + 10) * (Math.random() < 0.5 ? 1 : -1),
-            rotation: (Math.random() * 10 + 10) * (Math.random() < 0.5 ? 1 : -1)
-        };
+    cards.forEach((card, index) => {
+        const baseX = 30 + ((index * 13) % 20);
+        const baseY = 10 + ((index * 7) % 6);
+        const baseRotation = 10 + ((index * 5) % 10);
+        const direction = index % 2 === 0 ? 1 : -1;
 
         gsap.fromTo(card, {
-            rotation: values.rotation,
-            xPercent: values.x,
-            yPercent: values.y
+            rotation: () => baseRotation * direction * getMotionFactor(),
+            xPercent: () => baseX * direction * getMotionFactor(),
+            yPercent: () => baseY * direction * getMotionFactor()
         }, {
-            rotation: -values.rotation,
-            xPercent: -values.x,
-            yPercent: -values.y,
+            rotation: () => -baseRotation * direction * getMotionFactor(),
+            xPercent: () => -baseX * direction * getMotionFactor(),
+            yPercent: () => -baseY * direction * getMotionFactor(),
             ease: "none",
             scrollTrigger: {
                 trigger: card,
@@ -184,6 +192,7 @@ window.addEventListener("DOMContentLoaded", () => {
                 start: "left 120%",
                 end: "right -20%",
                 scrub: true,
+                invalidateOnRefresh: true
             }
         });
     });
@@ -485,6 +494,11 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     window.addEventListener("resize", () => {
+        fitCardTitles();
+        ScrollTrigger.refresh();
+    });
+
+    window.addEventListener("load", () => {
         fitCardTitles();
         ScrollTrigger.refresh();
     });
