@@ -24,13 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
     const distance = cardsContainer.scrollWidth - window.innerWidth;
     const buttonHold = 1200;
     const correctPasscode = "exatlon123";
-
-    /*
-        Replace this later with your real file path.
-        Example:
-        const downloadFile = "assets/files/sorpresas.pdf";
-    */
-    const downloadFile = "assets/medias/surprise-boxes.png";
+    const downloadFile = "assets/files/surprise-boxes.zip";
 
     let activeSourceCard = null;
     let floatingCard = null;
@@ -62,6 +56,7 @@ window.addEventListener("DOMContentLoaded", () => {
             while (title.scrollHeight > maxHeight && fontSize > 16) {
                 fontSize -= 1;
                 title.style.fontSize = `${fontSize}px`;
+
                 lineHeight = parseFloat(window.getComputedStyle(title).lineHeight);
 
                 if (!lineHeight || Number.isNaN(lineHeight)) {
@@ -78,10 +73,12 @@ window.addEventListener("DOMContentLoaded", () => {
         pointerEvents: "none"
     });
 
-    gsap.set(finalUnlock, {
-        autoAlpha: 0,
-        pointerEvents: "none"
-    });
+    if (finalUnlock) {
+        gsap.set(finalUnlock, {
+            autoAlpha: 0,
+            pointerEvents: "none"
+        });
+    }
 
     gsap.timeline({
         scrollTrigger: {
@@ -124,9 +121,7 @@ window.addEventListener("DOMContentLoaded", () => {
         duration: 0.3
     });
 
-    const scrollTween = gsap.to(cardsContainer, {
-        x: -distance,
-        ease: "none",
+    const scrollTween = gsap.timeline({
         scrollTrigger: {
             trigger: container,
             pin: true,
@@ -134,6 +129,8 @@ window.addEventListener("DOMContentLoaded", () => {
             start: "top top",
             end: "+=" + (distance + buttonHold),
             onUpdate: (self) => {
+                if (!finalUnlock) return;
+
                 if (self.progress > 0.985 && !isOpen) {
                     finalUnlock.classList.add("is-visible");
                     gsap.to(finalUnlock, {
@@ -152,6 +149,18 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         }
     });
+
+    scrollTween
+        .to(cardsContainer, {
+            x: 0,
+            ease: "none",
+            duration: buttonHold
+        })
+        .to(cardsContainer, {
+            x: -distance,
+            ease: "none",
+            duration: distance
+        });
 
     cards.forEach((card) => {
         const values = {
@@ -180,6 +189,8 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     function openPasscodeModal() {
+        if (!passcodeModal) return;
+
         passcodeModal.classList.add("is-open");
         passcodeInput.value = "";
         passcodeMessage.textContent = "";
@@ -188,6 +199,8 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 
     function closePasscodeModal() {
+        if (!passcodeModal) return;
+
         passcodeModal.classList.remove("is-open");
         passcodeInput.value = "";
         passcodeMessage.textContent = "";
@@ -250,11 +263,13 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    passcodeModal.addEventListener("click", (e) => {
-        if (e.target === passcodeModal) {
-            closePasscodeModal();
-        }
-    });
+    if (passcodeModal) {
+        passcodeModal.addEventListener("click", (e) => {
+            if (e.target === passcodeModal) {
+                closePasscodeModal();
+            }
+        });
+    }
 
     function getSourceRect(card) {
         return card.querySelector(".card-inner").getBoundingClientRect();

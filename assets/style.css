@@ -632,3 +632,11 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
     text-align: right;
     margin-left: auto;
 }
+
+@media (max-width: 480px) {
+    .reward-buttons .button-74:last-child {
+        grid-column: 1 / -1;
+        justify-self: center;
+        width: calc((100% - 10px) / 2);
+    }
+}
