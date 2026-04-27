@@ -635,8 +635,13 @@ body.card-open .mwg_effect001 .card.is-source-hidden {
 
 @media (max-width: 480px) {
     .reward-buttons .button-74:last-child {
-        grid-column: 1 / -1;
-        justify-self: center;
-        width: calc((100% - 10px) / 2);
+        grid-column: auto;
+        justify-self: auto;
+        width: 100%;
+        transform: translateX(calc(50% + 5px));
+    }
+
+    .reward-buttons .button-74:last-child:active {
+        transform: translateX(calc(50% + 7px)) translateY(2px);
     }
 }
